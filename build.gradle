@@ -1,14 +1,85 @@
 plugins {
 	id 'org.springframework.boot' version '2.0.5.RELEASE'
 }
-
+apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
 apply plugin: 'io.spring.dependency-management'
 
 group = 'com.adobe.target'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+
+
+task javadocJar(type: Jar) {
+	classifier = 'javadoc'
+	from javadoc
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+artifacts {
+	archives javadocJar, sourcesJar
+}
+
+signing {
+	sign configurations.archives
+}
+
+
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+
+			pom.project {
+				name 'Java-target-client'
+				packaging 'jar'
+				// optionally artifactId can be defined here
+				description 'Java-target-client-publishing to mevenCentral.'
+
+				url 'https://github.com/Adobe-Marketing-Cloud/target-java-client-samples'
+
+				scm {
+					connection 'scm:git:git://github.com/Adobe-Marketing-Cloud/target-java-client-samples.git'
+					developerConnection 'sscm:git:ssh://github.com:Adobe-Marketing-Cloud/target-java-client-samples.git'
+					url 'https://github.com/Adobe-Marketing-Cloud/target-java-client-samples'
+				}
+
+				licenses {
+					license {
+						name 'The Apache License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+
+				developers {
+					developer {
+						id 'ashismis'
+						name 'Ashish Mishra'
+						email 'ashismis@adobe.com'
+					}
+				}
+			}
+		}
+	}
+}
 
 repositories {
 	mavenCentral()
@@ -23,3 +94,4 @@ dependencies {
 	compile 'com.adobe.target:target-java-client:1.0.0-SNAPSHOT'
 	testCompile'org.springframework.boot:spring-boot-starter-test'
 }
+
