@@ -17,6 +17,7 @@ public class ClientSampleApplication {
 	    return DefaultMarketingCloudClient.builder()
 	          .clientId("adobetargetmobile" )
 	          .organizationId("2274402E5A99659A0A495EDC@AdobeOrg")
+	          .enableDebug( true )
 	          .secure( false )
 	          .timeout( 10000 )
 	          .build();
